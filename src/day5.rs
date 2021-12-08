@@ -42,6 +42,31 @@ fn parse_input(input: &str) -> Vec<Line> {
     lines
 }
 
+fn increment_grid_position(grid: &mut HashMap<i32, HashMap<i32, i32>>, overlap: &mut i32, x: i32, y: i32) {
+    match grid.get_mut(&x) {
+        Some(r) => {
+            match r.get_mut(&y) {
+                Some(existing) if *existing == 1 => {
+                    *overlap += 1;
+                    *existing += 1;
+                }
+                Some(existing) => {
+                    *existing += 1;
+                }
+                None => {
+                    r.insert(y, 1);
+                }
+            }
+        },
+        None => {
+            let mut m = HashMap::new();
+            m.insert(y, 1);
+            grid.insert(x, m);
+
+        }
+    }
+}
+
 fn compute_overlap(lines: &Vec<Line>, consider_diagonal: bool) -> i32 {
     let mut grid : HashMap<i32, HashMap<i32, i32>> = HashMap::new();
 
@@ -52,56 +77,14 @@ fn compute_overlap(lines: &Vec<Line>, consider_diagonal: bool) -> i32 {
                 let y_start = min(line.start.1, line.end.1);
                 let y_end = max(line.start.1, line.end.1) + 1;
                 for y in y_start .. y_end {
-                    match grid.get_mut(&line.start.0) {
-                        Some(r) => {
-                            match r.get_mut(&y) {
-                                Some(1) => {
-                                    overlap += 1;
-                                    r.insert(y, 2);
-                                }
-                                Some(existing) => {
-                                    *existing += 1;
-                                }
-                                None => {
-                                    r.insert(y, 1);
-                                }
-                            }
-                        },
-                        None => {
-                            let mut m = HashMap::new();
-                            m.insert(y, 1);
-                            grid.insert(line.start.0, m);
-
-                        }
-                    }
+                    increment_grid_position(&mut grid, &mut overlap, line.start.0, y);
                 }
             },
             AxialClassification::Y => {
                 let x_start = min(line.start.0, line.end.0);
                 let x_end = max(line.start.0, line.end.0) + 1;
                 for x in x_start..x_end {
-                    match grid.get_mut(&x) {
-                        Some(r) => {
-                            match r.get_mut(&line.start.1) {
-                                Some(1) => {
-                                    overlap += 1;
-                                    r.insert(line.start.1, 2);
-                                }
-                                Some(existing) => {
-                                    *existing += 1;
-                                }
-                                None => {
-                                    r.insert(line.start.1, 1);
-                                }
-                            }
-                        },
-                        None => {
-                            let mut m = HashMap::new();
-                            m.insert(line.start.1, 1);
-                            grid.insert(x, m);
-
-                        }
-                    }
+                    increment_grid_position(&mut grid, &mut overlap, x, line.start.1);
                 }
             },
             AxialClassification::NonAxial => {
@@ -114,28 +97,7 @@ fn compute_overlap(lines: &Vec<Line>, consider_diagonal: bool) -> i32 {
                     for inc in 0..length {
                         let x = x_start + inc * x_sign;
                         let y = y_start + inc * y_sign;
-                        match grid.get_mut(&x) {
-                            Some(r) => {
-                                match r.get_mut(&y) {
-                                    Some(1) => {
-                                        overlap += 1;
-                                        r.insert(y, 2);
-                                    }
-                                    Some(existing) => {
-                                        *existing += 1;
-                                    }
-                                    None => {
-                                        r.insert(y, 1);
-                                    }
-                                }
-                            },
-                            None => {
-                                let mut m = HashMap::new();
-                                m.insert(y, 1);
-                                grid.insert(x, m);
-
-                            }
-                        }
+                        increment_grid_position(&mut grid, &mut overlap, x, y);
                     }
                 }
             }
