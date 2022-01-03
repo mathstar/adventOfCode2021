@@ -4,7 +4,7 @@ mod day2;
 mod day3;
 mod day4;
 mod day5;
-// mod day6;
+mod day6;
 // mod day7;
 // mod day8;
 // mod day9;
@@ -41,7 +41,7 @@ fn main() {
     days.insert("3", Box::new(day3::Day3{}));
     days.insert("4", Box::new(day4::Day4{}));
     days.insert("5", Box::new(day5::Day5{}));
-    // days.insert("6", Box::new(day6::Day6{}));
+    days.insert("6", Box::new(day6::Day6{}));
     // days.insert("7", Box::new(day7::Day7{}));
     // days.insert("8", Box::new(day8::Day8{}));
     // days.insert("9", Box::new(day9::Day9{}));
